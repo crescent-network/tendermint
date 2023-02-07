@@ -1,7 +1,7 @@
 package types
 
 import (
-	context "golang.org/x/net/context"
+	"golang.org/x/net/context"
 )
 
 // Application is an interface that enables any finite, deterministic state machine
@@ -20,6 +20,7 @@ type Application interface {
 	// Consensus Connection
 	InitChain(RequestInitChain) ResponseInitChain    // Initialize blockchain w validators/other info from TendermintCore
 	BeginBlock(RequestBeginBlock) ResponseBeginBlock // Signals the beginning of a block
+	MidBlock(RequestMidBlock) ResponseMidBlock       // Temporary deliver txs after begin block
 	DeliverTx(RequestDeliverTx) ResponseDeliverTx    // Deliver a tx for full processing
 	EndBlock(RequestEndBlock) ResponseEndBlock       // Signals the end of a block, returns changes to the validator set
 	Commit() ResponseCommit                          // Commit the state and return the application Merkle root hash
@@ -73,6 +74,10 @@ func (BaseApplication) InitChain(req RequestInitChain) ResponseInitChain {
 
 func (BaseApplication) BeginBlock(req RequestBeginBlock) ResponseBeginBlock {
 	return ResponseBeginBlock{}
+}
+
+func (BaseApplication) MidBlock(req RequestMidBlock) ResponseMidBlock {
+	return ResponseMidBlock{}
 }
 
 func (BaseApplication) EndBlock(req RequestEndBlock) ResponseEndBlock {
@@ -151,6 +156,11 @@ func (app *GRPCApplication) InitChain(ctx context.Context, req *RequestInitChain
 
 func (app *GRPCApplication) BeginBlock(ctx context.Context, req *RequestBeginBlock) (*ResponseBeginBlock, error) {
 	res := app.app.BeginBlock(*req)
+	return &res, nil
+}
+
+func (app *GRPCApplication) MidBlock(ctx context.Context, req *RequestMidBlock) (*ResponseMidBlock, error) {
+	res := app.app.MidBlock(*req)
 	return &res, nil
 }
 

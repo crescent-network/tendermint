@@ -255,6 +255,15 @@ func (cli *grpcClient) BeginBlockAsync(params types.RequestBeginBlock) *ReqRes {
 	return cli.finishAsyncCall(req, &types.Response{Value: &types.Response_BeginBlock{BeginBlock: res}})
 }
 
+func (cli *grpcClient) MidBlockAsync(params types.RequestMidBlock) *ReqRes {
+	req := types.ToRequestMidBlock(params)
+	res, err := cli.client.MidBlock(context.Background(), req.GetMidBlock(), grpc.WaitForReady(true))
+	if err != nil {
+		cli.StopForError(err)
+	}
+	return cli.finishAsyncCall(req, &types.Response{Value: &types.Response_MidBlock{MidBlock: res}})
+}
+
 func (cli *grpcClient) EndBlockAsync(params types.RequestEndBlock) *ReqRes {
 	req := types.ToRequestEndBlock(params)
 	res, err := cli.client.EndBlock(context.Background(), req.GetEndBlock(), grpc.WaitForReady(true))
@@ -389,6 +398,11 @@ func (cli *grpcClient) InitChainSync(params types.RequestInitChain) (*types.Resp
 func (cli *grpcClient) BeginBlockSync(params types.RequestBeginBlock) (*types.ResponseBeginBlock, error) {
 	reqres := cli.BeginBlockAsync(params)
 	return cli.finishSyncCall(reqres).GetBeginBlock(), cli.Error()
+}
+
+func (cli *grpcClient) MidBlockSync(params types.RequestMidBlock) (*types.ResponseMidBlock, error) {
+	reqres := cli.MidBlockAsync(params)
+	return cli.finishSyncCall(reqres).GetMidBlock(), cli.Error()
 }
 
 func (cli *grpcClient) EndBlockSync(params types.RequestEndBlock) (*types.ResponseEndBlock, error) {

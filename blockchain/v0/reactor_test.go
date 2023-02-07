@@ -311,6 +311,10 @@ func (app *testApp) BeginBlock(req abci.RequestBeginBlock) abci.ResponseBeginBlo
 	return abci.ResponseBeginBlock{}
 }
 
+func (app *testApp) MidBlock(req abci.RequestMidBlock) abci.ResponseMidBlock {
+	return abci.ResponseMidBlock{}
+}
+
 func (app *testApp) EndBlock(req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return abci.ResponseEndBlock{}
 }

@@ -145,6 +145,11 @@ func (app *PersistentKVStoreApplication) BeginBlock(req types.RequestBeginBlock)
 	return types.ResponseBeginBlock{}
 }
 
+func (app *PersistentKVStoreApplication) MidBlock(req types.RequestMidBlock) types.ResponseMidBlock {
+	app.logger.Info("PersistentKVStoreApplication, MidBlock")
+	return types.ResponseMidBlock{}
+}
+
 // Update the validator set
 func (app *PersistentKVStoreApplication) EndBlock(req types.RequestEndBlock) types.ResponseEndBlock {
 	return types.ResponseEndBlock{ValidatorUpdates: app.ValUpdates}

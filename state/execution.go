@@ -315,6 +315,19 @@ func execBlockOnProxyApp(
 		return nil, err
 	}
 
+	// Mid block
+	txs := [][]byte{}
+	for _, tx := range block.Txs {
+		txs = append(txs, tx)
+	}
+	events, err := proxyAppConn.MidBlockSync(abci.RequestMidBlock{
+		Txs: txs,
+	})
+	if err != nil {
+		logger.Error("error in proxyAppConn.MidBlock", "err", err, "events", events)
+		return nil, err
+	}
+
 	// run txs of block
 	for _, tx := range block.Txs {
 		proxyAppConn.DeliverTxAsync(abci.RequestDeliverTx{Tx: tx})

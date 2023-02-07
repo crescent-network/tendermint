@@ -35,6 +35,7 @@ type Client interface {
 	CommitAsync() *ReqRes
 	InitChainAsync(types.RequestInitChain) *ReqRes
 	BeginBlockAsync(types.RequestBeginBlock) *ReqRes
+	MidBlockAsync(types.RequestMidBlock) *ReqRes
 	EndBlockAsync(types.RequestEndBlock) *ReqRes
 	ListSnapshotsAsync(types.RequestListSnapshots) *ReqRes
 	OfferSnapshotAsync(types.RequestOfferSnapshot) *ReqRes
@@ -51,6 +52,7 @@ type Client interface {
 	CommitSync() (*types.ResponseCommit, error)
 	InitChainSync(types.RequestInitChain) (*types.ResponseInitChain, error)
 	BeginBlockSync(types.RequestBeginBlock) (*types.ResponseBeginBlock, error)
+	MidBlockSync(types.RequestMidBlock) (*types.ResponseMidBlock, error)
 	EndBlockSync(types.RequestEndBlock) (*types.ResponseEndBlock, error)
 	ListSnapshotsSync(types.RequestListSnapshots) (*types.ResponseListSnapshots, error)
 	OfferSnapshotSync(types.RequestOfferSnapshot) (*types.ResponseOfferSnapshot, error)
