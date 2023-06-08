@@ -73,6 +73,15 @@ type mockProxyApp struct {
 	abciResponses *tmstate.ABCIResponses
 }
 
+func (app *mockProxyApp) MidBlock(req abci.RequestMidBlock) abci.ResponseMidBlock {
+	txResults := make([]*abci.ResponseDeliverTx, len(req.Txs))
+	for idx, tx := range req.Txs {
+		res := app.DeliverTx(abci.RequestDeliverTx{Tx: tx})
+		txResults[idx] = &res
+	}
+	return abci.ResponseMidBlock{DeliverTxs: txResults, Events: []abci.Event{}}
+}
+
 func (mock *mockProxyApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx {
 	r := mock.abciResponses.DeliverTxs[mock.txCount]
 	mock.txCount++

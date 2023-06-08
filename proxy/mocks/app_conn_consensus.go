@@ -76,6 +76,29 @@ func (_m *AppConnConsensus) DeliverTxAsync(_a0 types.RequestDeliverTx) *abcicli.
 	return r0
 }
 
+// MidBlockSync provides a mock function with given fields: _a0
+func (_m *AppConnConsensus) MidBlockSync(_a0 types.RequestMidBlock) (*types.ResponseMidBlock, error) {
+	ret := _m.Called()
+
+	var r0 *types.ResponseMidBlock
+	if rf, ok := ret.Get(0).(func() *types.ResponseMidBlock); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.ResponseMidBlock)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // EndBlockSync provides a mock function with given fields: _a0
 func (_m *AppConnConsensus) EndBlockSync(_a0 types.RequestEndBlock) (*types.ResponseEndBlock, error) {
 	ret := _m.Called(_a0)

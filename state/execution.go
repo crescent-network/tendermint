@@ -271,25 +271,6 @@ func execBlockOnProxyApp(
 	abciResponses.DeliverTxs = dtxs
 
 	// Execute transactions and get hash.
-	proxyCb := func(req *abci.Request, res *abci.Response) {
-		if r, ok := res.Value.(*abci.Response_DeliverTx); ok {
-			// TODO: make use of res.Log
-			// TODO: make use of this info
-			// Blocks may include invalid txs.
-			txRes := r.DeliverTx
-			if txRes.Code == abci.CodeTypeOK {
-				validTxs++
-			} else {
-				logger.Debug("invalid tx", "code", txRes.Code, "log", txRes.Log)
-				invalidTxs++
-			}
-
-			abciResponses.DeliverTxs[txIndex] = txRes
-			txIndex++
-		}
-	}
-	proxyAppConn.SetResponseCallback(proxyCb)
-
 	commitInfo := getBeginBlockValidatorInfo(block, store, initialHeight)
 
 	byzVals := make([]abci.Evidence, 0)
@@ -315,13 +296,34 @@ func execBlockOnProxyApp(
 		return nil, err
 	}
 
-	// run txs of block
-	for _, tx := range block.Txs {
-		proxyAppConn.DeliverTxAsync(abci.RequestDeliverTx{Tx: tx})
-		if err := proxyAppConn.Error(); err != nil {
-			return nil, err
-		}
+	// Mid block
+	results, err := proxyAppConn.MidBlockSync(abci.RequestMidBlock{
+		Txs: block.Txs.ToSliceOfBytes(),
+	})
+	if err != nil {
+		logger.Error("error in proxyAppConn.MidBlock", "err", err)
+		return nil, err
 	}
+	for _, txRes := range results.DeliverTxs {
+		// Blocks may include invalid txs.
+		if txRes.Code == abci.CodeTypeOK {
+			validTxs++
+		} else {
+			logger.Debug("invalid tx", "code", txRes.Code, "log", txRes.Log)
+			invalidTxs++
+		}
+
+		abciResponses.DeliverTxs[txIndex] = txRes
+		txIndex++
+	}
+
+	// // WARNING: DeliverTx logics replaced with MidBlock
+	//for _, tx := range block.Txs {
+	//	proxyAppConn.DeliverTxAsync(abci.RequestDeliverTx{Tx: tx})
+	//	if err := proxyAppConn.Error(); err != nil {
+	//		return nil, err
+	//	}
+	//}
 
 	// End block.
 	abciResponses.EndBlock, err = proxyAppConn.EndBlockSync(abci.RequestEndBlock{Height: block.Height})
@@ -329,6 +331,9 @@ func execBlockOnProxyApp(
 		logger.Error("error in proxyAppConn.EndBlock", "err", err)
 		return nil, err
 	}
+
+	// Append MidBlock events to EndBlock
+	abciResponses.EndBlock.Events = append(results.Events, abciResponses.EndBlock.Events...)
 
 	logger.Info("executed block", "height", block.Height, "num_valid_txs", validTxs, "num_invalid_txs", invalidTxs)
 	return abciResponses, nil

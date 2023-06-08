@@ -259,6 +259,10 @@ func (cli *socketClient) BeginBlockAsync(req types.RequestBeginBlock) *ReqRes {
 	return cli.queueRequest(types.ToRequestBeginBlock(req))
 }
 
+func (cli *socketClient) MidBlockAsync(req types.RequestMidBlock) *ReqRes {
+	return cli.queueRequest(types.ToRequestMidBlock(req))
+}
+
 func (cli *socketClient) EndBlockAsync(req types.RequestEndBlock) *ReqRes {
 	return cli.queueRequest(types.ToRequestEndBlock(req))
 }
@@ -369,6 +373,15 @@ func (cli *socketClient) BeginBlockSync(req types.RequestBeginBlock) (*types.Res
 	}
 
 	return reqres.Response.GetBeginBlock(), cli.Error()
+}
+
+func (cli *socketClient) MidBlockSync(req types.RequestMidBlock) (*types.ResponseMidBlock, error) {
+	reqres := cli.queueRequest(types.ToRequestMidBlock(req))
+	if err := cli.FlushSync(); err != nil {
+		return nil, err
+	}
+
+	return reqres.Response.GetMidBlock(), cli.Error()
 }
 
 func (cli *socketClient) EndBlockSync(req types.RequestEndBlock) (*types.ResponseEndBlock, error) {

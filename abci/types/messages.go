@@ -129,6 +129,12 @@ func ToRequestBeginBlock(req RequestBeginBlock) *Request {
 	}
 }
 
+func ToRequestMidBlock(req RequestMidBlock) *Request {
+	return &Request{
+		Value: &Request_MidBlock{&req},
+	}
+}
+
 func ToRequestEndBlock(req RequestEndBlock) *Request {
 	return &Request{
 		Value: &Request_EndBlock{&req},
@@ -224,6 +230,12 @@ func ToResponseInitChain(res ResponseInitChain) *Response {
 func ToResponseBeginBlock(res ResponseBeginBlock) *Response {
 	return &Response{
 		Value: &Response_BeginBlock{&res},
+	}
+}
+
+func ToResponseMidBlock(res ResponseMidBlock) *Response {
+	return &Response{
+		Value: &Response_MidBlock{&res},
 	}
 }
 

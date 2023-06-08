@@ -66,6 +66,15 @@ func (app *PersistentKVStoreApplication) SetOption(req types.RequestSetOption) t
 	return app.app.SetOption(req)
 }
 
+func (app *PersistentKVStoreApplication) MidBlock(req types.RequestMidBlock) types.ResponseMidBlock {
+	txResults := make([]*types.ResponseDeliverTx, len(req.Txs))
+	for idx, tx := range req.Txs {
+		res := app.DeliverTx(types.RequestDeliverTx{Tx: tx})
+		txResults[idx] = &res
+	}
+	return types.ResponseMidBlock{DeliverTxs: txResults, Events: []types.Event{}}
+}
+
 // tx is either "val:pubkey!power" or "key=value" or just arbitrary bytes
 func (app *PersistentKVStoreApplication) DeliverTx(req types.RequestDeliverTx) types.ResponseDeliverTx {
 	// if it starts with "val:", update the validator set

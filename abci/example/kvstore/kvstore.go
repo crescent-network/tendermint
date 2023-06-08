@@ -85,6 +85,25 @@ func (app *Application) Info(req types.RequestInfo) (resInfo types.ResponseInfo)
 	}
 }
 
+func (app *Application) MidBlock(req types.RequestMidBlock) types.ResponseMidBlock {
+	txResults := make([]*types.ResponseDeliverTx, len(req.Txs))
+	for idx, tx := range req.Txs {
+		res := app.DeliverTx(types.RequestDeliverTx{Tx: tx})
+		txResults[idx] = &res
+	}
+	events := []types.Event{
+		{
+			Type: "midblock",
+			Attributes: []types.EventAttribute{
+				{Key: []byte("midblock_key1"), Value: []byte("midblock is working"), Index: true},
+				{Key: []byte("midblock_key2"), Value: []byte("midblock is working"), Index: false},
+			},
+		},
+	}
+
+	return types.ResponseMidBlock{DeliverTxs: txResults, Events: events}
+}
+
 // tx is either "key=value" or just arbitrary bytes
 func (app *Application) DeliverTx(req types.RequestDeliverTx) types.ResponseDeliverTx {
 	var key, value []byte

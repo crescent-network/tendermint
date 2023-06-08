@@ -36,6 +36,7 @@ message Request {
     RequestOfferSnapshot      offer_snapshot       = 13;
     RequestLoadSnapshotChunk  load_snapshot_chunk  = 14;
     RequestApplySnapshotChunk apply_snapshot_chunk = 15;
+    RequestMidBlock           mid_block            = 16;
   }
 }
 
@@ -79,6 +80,11 @@ message RequestBeginBlock {
   tendermint.types.Header header               = 2 [(gogoproto.nullable) = false];
   LastCommitInfo          last_commit_info     = 3 [(gogoproto.nullable) = false];
   repeated Evidence       byzantine_validators = 4 [(gogoproto.nullable) = false];
+}
+
+
+message RequestMidBlock {
+  repeated bytes txs = 1;
 }
 
 enum CheckTxType {
@@ -145,6 +151,7 @@ message Response {
     ResponseOfferSnapshot      offer_snapshot       = 14;
     ResponseLoadSnapshotChunk  load_snapshot_chunk  = 15;
     ResponseApplySnapshotChunk apply_snapshot_chunk = 16;
+    ResponseMidBlock           mid_block            = 17;
   }
 }
 
@@ -198,6 +205,12 @@ message ResponseQuery {
 
 message ResponseBeginBlock {
   repeated Event events = 1
+      [(gogoproto.nullable) = false, (gogoproto.jsontag) = "events,omitempty"];
+}
+
+message ResponseMidBlock {
+  repeated ResponseDeliverTx deliver_txs = 1;
+  repeated Event events = 2
       [(gogoproto.nullable) = false, (gogoproto.jsontag) = "events,omitempty"];
 }
 
@@ -410,4 +423,5 @@ service ABCIApplication {
       returns (ResponseLoadSnapshotChunk);
   rpc ApplySnapshotChunk(RequestApplySnapshotChunk)
       returns (ResponseApplySnapshotChunk);
+  rpc MidBlock(RequestMidBlock) returns (ResponseMidBlock);
 }

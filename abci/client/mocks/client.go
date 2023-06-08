@@ -172,6 +172,45 @@ func (_m *Client) CommitSync() (*types.ResponseCommit, error) {
 	return r0, r1
 }
 
+// MidBlockSync provides a mock function with given fields: _a0
+func (_m *Client) MidBlockSync(_a0 types.RequestMidBlock) (*types.ResponseMidBlock, error) {
+	ret := _m.Called()
+
+	var r0 *types.ResponseMidBlock
+	if rf, ok := ret.Get(0).(func() *types.ResponseMidBlock); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*types.ResponseMidBlock)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MidBlockAsync provides a mock function with given fields: _a0
+func (_m *Client) MidBlockAsync(_a0 types.RequestMidBlock) *abcicli.ReqRes {
+	ret := _m.Called(_a0)
+
+	var r0 *abcicli.ReqRes
+	if rf, ok := ret.Get(0).(func(types.RequestMidBlock) *abcicli.ReqRes); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*abcicli.ReqRes)
+		}
+	}
+
+	return r0
+}
+
 // DeliverTxAsync provides a mock function with given fields: _a0
 func (_m *Client) DeliverTxAsync(_a0 types.RequestDeliverTx) *abcicli.ReqRes {
 	ret := _m.Called(_a0)

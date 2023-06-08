@@ -219,6 +219,16 @@ func (app *CounterApplication) Info(req abci.RequestInfo) abci.ResponseInfo {
 	return abci.ResponseInfo{Data: fmt.Sprintf("txs:%v", app.txCount)}
 }
 
+func (app *CounterApplication) MidBlock(req abci.RequestMidBlock) abci.ResponseMidBlock {
+	txResults := make([]*abci.ResponseDeliverTx, len(req.Txs))
+	for idx, tx := range req.Txs {
+		res := app.DeliverTx(abci.RequestDeliverTx{Tx: tx})
+		txResults[idx] = &res
+	}
+
+	return abci.ResponseMidBlock{DeliverTxs: txResults}
+}
+
 func (app *CounterApplication) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx {
 	txValue := txAsUint64(req.Tx)
 	if txValue != uint64(app.txCount) {

@@ -42,6 +42,15 @@ func (app *Application) SetOption(req types.RequestSetOption) types.ResponseSetO
 	return types.ResponseSetOption{}
 }
 
+func (app *Application) MidBlock(req types.RequestMidBlock) types.ResponseMidBlock {
+	txResults := make([]*types.ResponseDeliverTx, len(req.Txs))
+	for idx, tx := range req.Txs {
+		res := app.DeliverTx(types.RequestDeliverTx{Tx: tx})
+		txResults[idx] = &res
+	}
+	return types.ResponseMidBlock{DeliverTxs: txResults, Events: []types.Event{}}
+}
+
 func (app *Application) DeliverTx(req types.RequestDeliverTx) types.ResponseDeliverTx {
 	if app.serial {
 		if len(req.Tx) > 8 {

@@ -260,6 +260,14 @@ func (app *testApp) EndBlock(req abci.RequestEndBlock) abci.ResponseEndBlock {
 				AppVersion: 1}}}
 }
 
+func (app *testApp) MidBlock(req abci.RequestMidBlock) abci.ResponseMidBlock {
+	txResults := make([]*abci.ResponseDeliverTx, len(req.Txs))
+	for idx := range req.Txs {
+		txResults[idx] = &abci.ResponseDeliverTx{}
+	}
+	return abci.ResponseMidBlock{DeliverTxs: txResults, Events: []abci.Event{}}
+}
+
 func (app *testApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx {
 	return abci.ResponseDeliverTx{Events: []abci.Event{}}
 }

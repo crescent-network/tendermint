@@ -139,6 +139,16 @@ func (app *Application) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
 	return abci.ResponseCheckTx{Code: code.CodeTypeOK, GasWanted: 1}
 }
 
+// MidBlock implements ABCI.
+func (app *Application) MidBlock(req abci.RequestMidBlock) abci.ResponseMidBlock {
+	txResults := make([]*abci.ResponseDeliverTx, len(req.Txs))
+	for idx, tx := range req.Txs {
+		res := app.DeliverTx(abci.RequestDeliverTx{Tx: tx})
+		txResults[idx] = &res
+	}
+	return abci.ResponseMidBlock{DeliverTxs: txResults, Events: []abci.Event{}}
+}
+
 // DeliverTx implements ABCI.
 func (app *Application) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx {
 	key, value, err := parseTx(req.Tx)
